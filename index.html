@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ana Laura - 1 Aninho | Convite Interativo</title>
+  
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      background-color: #111;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    /* Container no formato Story (9:16) */
+    .story-container {
+      width: 100vw;
+      height: 100vh;
+      max-width: 430px;
+      max-height: 932px;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    @media (min-width: 440px) {
+      .story-container {
+        border-radius: 24px;
+        height: 90vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+  const { useState, useRef } = React;
+
+  // CONFIGURAÇÃO DOS DADOS DO CLIENTE (Altere os caminhos dos arquivos aqui)
+  const CONVITE_DATA = {
+    cliente: "Ana Laura",
+    musicaBg: "/uploads/musica-tema.mp3",
+    capaImg: "/uploads/388682.jpg",        // Imagem do envelope fechado
+    transicaoVideo: "/uploads/388692.mp4", // Vídeo do CapCut
+    principalImg: "/uploads/388683.jpg",   // Cartão do convite principal
+    presentesImg: "/uploads/388684.jpg",   // Cartão de sugestão de presentes
+    whatsappUrl: "https://wa.me/5500000000000?text=Ol%C3%A1!%20Quero%20confirmar%20minha%20presen%C3%A7a%20no%20anivers%C3%A1rio%20da%20Ana%20Laura!",
+    mapsUrl: "https://maps.google.com/?q=Espaco+Villa+Jardim"
+  };
+
+  function App() {
+    // Estados de Navegação: 'capa' | 'video' | 'principal' | 'presentes'
+    const [etapa, setEtapa] = useState('capa');
+    const audioRef = useRef(null);
+    const videoRef = useRef(null);
+
+    // Inicia o som e avança para a animação em vídeo
+    const abrirConvite = () => {
+      if (audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+      setEtapa('video');
+    };
+
+    // Quando o vídeo da animação termina, vai para a tela interativa principal
+    const aoTerminarVideo = () => {
+      setEtapa('principal');
+    };
+
+    return (
+      <div className="story-container text-white">
+        {/* Áudio de Fundo */}
+        <audio ref={audioRef} src={CONVITE_DATA.musicaBg} loop />
+
+        {/* 1. TELA DE CAPA / ENVELOPE (ESTÁTICA) */}
+        {etapa === 'capa' && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center flex flex-col justify-end p-6 cursor-pointer"
+            style={{ backgroundImage: `url(${CONVITE_DATA.capaImg})` }}
+            onClick={abrirConvite}
+          >
+            <div className="bg-black/40 backdrop-blur-md p-4 rounded-2xl text-center mb-10 border border-white/20 animate-pulse">
+              <p className="text-lg font-bold">✨ Clique para abrir ✨</p>
+              <p className="text-xs text-gray-200 mt-1">🔊 Ative o som</p>
+            </div>
+          </div>
+        )}
+
+        {/* 2. TRANSIÇÃO EM VÍDEO (CAPCUT) */}
+        {etapa === 'video' && (
+          <video
+            ref={videoRef}
+            src={CONVITE_DATA.transicaoVideo}
+            className="w-full h-full object-cover"
+            autoPlay
+            playsInline
+            onEnded={aoTerminarVideo}
+          />
+        )}
+
+        {/* 3. TELA PRINCIPAL (CONVITE COM BOTÕES CLICÁVEIS) */}
+        {etapa === 'principal' && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center flex flex-col justify-end p-6"
+            style={{ backgroundImage: `url(${CONVITE_DATA.principalImg})` }}
+          >
+            {/* Camada de Botões Interativos posicionados na parte inferior */}
+            <div className="flex flex-col gap-3 mb-8 w-full max-w-xs mx-auto">
+              {/* Botão RSVP */}
+              <a 
+                href={CONVITE_DATA.whatsappUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-3.5 px-4 bg-pink-500/90 hover:bg-pink-600 text-white font-bold rounded-xl text-center shadow-lg backdrop-blur-sm transition-transform active:scale-95 flex items-center justify-center gap-2"
+              >
+                <span>Confirmar presença</span>
+              </a>
+
+              {/* Botão Localização */}
+              <a 
+                href={CONVITE_DATA.mapsUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-full py-3.5 px-4 bg-teal-500/90 hover:bg-teal-600 text-white font-bold rounded-xl text-center shadow-lg backdrop-blur-sm transition-transform active:scale-95 flex items-center justify-center gap-2"
+              >
+                <span>Localização do evento</span>
+              </a>
+
+              {/* Botão Sugestão de Presentes */}
+              <button 
+                onClick={() => setEtapa('presentes')}
+                className="w-full py-3.5 px-4 bg-purple-500/90 hover:bg-purple-600 text-white font-bold rounded-xl text-center shadow-lg backdrop-blur-sm transition-transform active:scale-95 flex items-center justify-center gap-2"
+              >
+                <span>Sugestões de presentes</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 4. TELA DE SUGESTÃO DE PRESENTES */}
+        {etapa === 'presentes' && (
+          <div 
+            className="absolute inset-0 bg-cover bg-center flex flex-col justify-end p-6"
+            style={{ backgroundImage: `url(${CONVITE_DATA.presentesImg})` }}
+          >
+            <div className="mb-8 w-full max-w-xs mx-auto">
+              <button 
+                onClick={() => setEtapa('principal')}
+                className="w-full py-3.5 px-4 bg-gray-900/80 hover:bg-black text-white font-bold rounded-xl text-center shadow-lg backdrop-blur-sm transition-transform active:scale-95 border border-white/20"
+              >
+                ← Clique para voltar
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+</script>
+
+</body>
+</html>
